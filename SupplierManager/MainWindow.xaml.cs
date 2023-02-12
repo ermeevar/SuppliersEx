@@ -4,6 +4,8 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using SupplierManager.Database;
+using SupplierManager.Utils;
 
 namespace SupplierManager
 {
@@ -13,22 +15,23 @@ namespace SupplierManager
     public partial class MainWindow : Window
     {
         List<Supplier> DataSuppliers;
-        LopushokEntities context = new LopushokEntities();
+        public static LopushokEntities Context = new LopushokEntities();
         private int page = 0;
 
         public MainWindow()
         {
             InitializeComponent();
             DataContext = this;
-            DataSuppliers = context.Suppliers.ToList();
+            DataSuppliers = Context.Suppliers.ToList();
             DateStartSorter.SelectedIndex = 0;
+            //MigratePictiresExecuter.Migrate();
 
             Filter();
         }
 
         private void Next_Click(object sender, RoutedEventArgs e)
         {
-            if (page < (int)Math.Round((double)context.Suppliers.Count() / 20) - 1)
+            if (page < (int)Math.Round((double)Context.Suppliers.Count() / 20) - 1)
                 page++;
 
             Filter();
@@ -72,14 +75,14 @@ namespace SupplierManager
             // Спеова все фильтруем по каждому объекту-фильтру/ сортировки
             if (!string.IsNullOrWhiteSpace(NameSorter.Text))
             {
-                DataSuppliers = context.Suppliers
+                DataSuppliers = Context.Suppliers
                     .Where(x => x.Title.Contains(NameSorter.Text))
                     .OrderBy(x => x.ID)
                     .ToList();
             }
             else
             {
-                DataSuppliers = context.Suppliers .OrderBy(x => x.ID).ToList();
+                DataSuppliers = Context.Suppliers .OrderBy(x => x.ID).ToList();
             }
             
             // Вызываем метод для обновления кнопок
@@ -95,7 +98,7 @@ namespace SupplierManager
 
             // Обновляем источник для элемента компоновки и обновляем лэйбл
             Suppliers.ItemsSource = DataSuppliers;
-            CountOfSupplier.Content = $"{(20 * page) + DataSuppliers.Count}/{context.Suppliers.Count()}";
+            CountOfSupplier.Content = $"{(20 * page) + DataSuppliers.Count}/{Context.Suppliers.Count()}";
         }
 
         /// <summary>

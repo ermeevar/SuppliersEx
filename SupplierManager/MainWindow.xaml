@@ -56,6 +56,15 @@
                 <DataGridTextColumn Header="Тип Организации"
                                     Width="*"
                                     Binding="{Binding SupplierType1.Name}"/>
+                <DataGridTemplateColumn Header="Картинка">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Image Height="50"
+                                   Width="50"
+                                   Source="{Binding Picture}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
             </DataGrid.Columns>
         </DataGrid>
 
@@ -88,13 +97,15 @@
                         Height="40"/>
             </StackPanel>
             
-            <StackPanel Orientation="Horizontal"
-                        CanHorizontallyScroll="True"
-                        Width="300"
-                        Name="PagingPanel"
-                        Margin="50, 0, 50, 0"
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Center"/>
+            <ScrollViewer Width="300"
+                          HorizontalScrollBarVisibility="Visible"
+                          VerticalScrollBarVisibility="Hidden">
+                <StackPanel Orientation="Horizontal"
+                            Name="PagingPanel"
+                            Margin="50, 0, 50, 0"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"/>
+            </ScrollViewer>
         </StackPanel>
     </Grid>
 </Window>
