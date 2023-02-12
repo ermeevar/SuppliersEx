@@ -57,38 +57,69 @@ namespace SupplierManager
             Filter();
         }
 
+        private void OnButtonClick(object sender, RoutedEventArgs e)
+        {
+            page = Convert.ToInt32((sender as Button).Content) - 1;
+            
+            Filter();
+        }
+
+        /// <summary>
+        /// Метод для фильтрации и пагинации в комбинациях
+        /// </summary>
         private void Filter()
         {
+            // Спеова все фильтруем по каждому объекту-фильтру/ сортировки
             if (!string.IsNullOrWhiteSpace(NameSorter.Text))
             {
                 DataSuppliers = context.Suppliers
                     .Where(x => x.Title.Contains(NameSorter.Text))
                     .OrderBy(x => x.ID)
-                    .Skip(20 * page)
-                    .Take(20)
                     .ToList();
             }
             else
             {
-                DataSuppliers = context.Suppliers
-                    .OrderBy(x => x.ID)
-                    .Skip(20 * page)
-                    .Take(20)
-                    .ToList();
+                DataSuppliers = context.Suppliers .OrderBy(x => x.ID).ToList();
             }
+            
+            // Вызываем метод для обновления кнопок
+            CreatePagingList();
+            
+            // Потом мы делаем пагинацию
+            DataSuppliers = DataSuppliers.Skip(20 * page).Take(20).ToList();
 
-            if (DateStartSorter.SelectedIndex == 0)
-            {
-                DataSuppliers = DataSuppliers.OrderBy(x => x.StartDate).ToList();
-            }
-            else
-            {
-                DataSuppliers = DataSuppliers.OrderByDescending(x => x.StartDate).ToList();
-            }
+            // После этого сортируем 
+            DataSuppliers = DateStartSorter.SelectedIndex == 0 
+                ? DataSuppliers.OrderBy(x => x.StartDate).ToList() 
+                : DataSuppliers.OrderByDescending(x => x.StartDate).ToList();
 
-
+            // Обновляем источник для элемента компоновки и обновляем лэйбл
             Suppliers.ItemsSource = DataSuppliers;
             CountOfSupplier.Content = $"{(20 * page) + DataSuppliers.Count}/{context.Suppliers.Count()}";
+        }
+
+        /// <summary>
+        /// Метод для более сложной пагинации с кнопками
+        /// </summary>
+        private void CreatePagingList()
+        {
+            // Очищаем весь список
+            PagingPanel.Children.RemoveRange(0, PagingPanel.Children.Count);
+            
+            // Задаем все кнопки пагинации 
+            for (var i = 1; i <= (int)Math.Round((double)DataSuppliers.Count / 20); i++)
+            {
+                var button = new Button
+                {
+                    Width = 30,
+                    Height = 30,
+                    Content = i.ToString()
+                };
+                button.Click += OnButtonClick;
+                
+                // Добавляем в панель
+                PagingPanel.Children.Add(button);
+            }
         }
     }
 }
